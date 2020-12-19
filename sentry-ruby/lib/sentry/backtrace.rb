@@ -51,6 +51,7 @@ module Sentry
       def initialize(file, number, method, module_name, in_app_pattern)
         @file = file
         @module_name = module_name
+        raise module_name if module_name
         @number = number.to_i
         @method = method
         @in_app_pattern = in_app_pattern
