@@ -18,7 +18,7 @@ module Sentry
     )
 
     attr_accessor(*ATTRIBUTES)
-    attr_reader :configuration, :request, :exception, :stacktrace
+    attr_reader :configuration, :request, :exception, :stacktrace, :threads
 
     def initialize(configuration:, integration_meta: nil, message: nil)
       # this needs to go first because some setters rely on configuration
@@ -99,12 +99,23 @@ module Sentry
       data[:stacktrace] = stacktrace.to_hash if stacktrace
       data[:request] = request.to_hash if request
       data[:exception] = exception.to_hash if exception
+      data[:threads] = threads.to_hash if threads
 
       data
     end
 
     def to_json_compatible
       JSON.parse(JSON.generate(to_hash))
+    end
+
+    def add_threads_interface(backtrace: nil, **options)
+      @threads = ThreadsInterface.new(**options)
+
+      if backtrace
+        @threads.stacktrace = StacktraceInterface.new.tap do |stacktrace|
+          stacktrace.frames = stacktrace_interface_from(backtrace)
+        end
+      end
     end
 
     def add_exception_interface(exc)
