@@ -166,6 +166,11 @@ class SentryJob < ActiveJob::Base
 end
 ```
 
+If you also use `sentry-rails`, you can directly use the job we defined for you:
+
+```ruby
+config.async = lambda { |event| Sentry::SendEventJob.perform_later(event) }
+```
 
 **After version 4.1.0**, `sentry-ruby` sends events asynchronously by default. The functionality works like this: 
 
