@@ -158,6 +158,7 @@ config.async = lambda { |event| SentryJob.perform_later(event) }
 
 class SentryJob < ActiveJob::Base
   queue_as :default
+  discard_on ActiveJob::DeserializationError # this will prevent infinite loop when there's an issue deserializing SentryJob
 
   def perform(event)
     Sentry.send_event(event)
